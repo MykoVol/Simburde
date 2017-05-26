@@ -13,8 +13,8 @@ public class Mouse {
             double dy = (y2 - y1) / ((double) n);
             double dt = t / ((double) n);
             for (int step = 1; step <= n; step++) {
-                Thread.sleep((int) dt);
                 r.mouseMove((int) (x1 + dx * step), (int) (y1 + dy * step));
+                Thread.sleep((int) dt);
             }
         } catch (AWTException e) {
             e.printStackTrace();

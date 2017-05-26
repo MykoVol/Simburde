@@ -27,10 +27,12 @@ public class HotKey {
             } else if (arg0 == 3) {
                 SimburdeConfig.getInstance().setMouseRightBottomAngle();
             } else if (arg0 == 4) {
-                new Mouse().mouseGlide(AppProperties.getLeftUpperAngleX(), AppProperties.getLeftUpperAngleY(), AppProperties.getRightBottomAngleX(), AppProperties.getRightBottomAngleY(), 10000, 10000);
+                new Mouse().mouseGlide(AppProperties.getLeftUpperAngleX(), AppProperties.getLeftUpperAngleY(), AppProperties.getRightBottomAngleX(), AppProperties.getRightBottomAngleY(), 10000, 1000);
             }
 
         });
+
+        SimburdeConfig.getInstance().showForm();
 
     }
 

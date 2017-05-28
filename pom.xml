@@ -6,7 +6,7 @@
 
     <groupId>com.mykovol.Simburde</groupId>
     <artifactId>Simburde</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 
     <repositories>
         <repository>
@@ -70,6 +70,7 @@
                     <!--</excludes>-->
                     <archive>
                         <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
                             <mainClass>com.mykovol.Simburde.Main</mainClass>
                             <classpathPrefix>lib/</classpathPrefix>
@@ -100,7 +101,7 @@
                 <version>3.0.2</version>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-dll</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -111,12 +112,26 @@
                             <resources>
                                 <resource>
                                     <filtering>false</filtering><!-- if it is neccessary -->
-                                    <directory>${project.basedir}/src/main/ddl</directory><!-- from -->
+                                    <directory>${project.basedir}/src/main/dll</directory><!-- from -->
                                     <targetPath>${project.build.directory}/lib</targetPath><!-- to -->
-                                    <!--<includes>&lt;!&ndash; what &ndash;&gt;-->
-                                        <!--<include>JIntellitype.dll</include>-->
-                                        <!--<include>JIntellitype64.dll</include>-->
-                                    <!--</includes>-->
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-runMethod</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <outputDirectory>${project.build.directory}/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <filtering>false</filtering><!-- if it is neccessary -->
+                                    <directory>${project.basedir}/src/main/run</directory><!-- from -->
+                                    <targetPath>${project.build.directory}</targetPath><!-- to -->
                                 </resource>
                             </resources>
                         </configuration>

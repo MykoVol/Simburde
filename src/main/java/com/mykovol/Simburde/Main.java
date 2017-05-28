@@ -2,10 +2,6 @@ package com.mykovol.Simburde;
 
 import org.apache.log4j.Logger;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import static com.sun.jna.NativeLibrary.getProcess;
 
 /**
@@ -16,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        AppProperties.getProperties();
+        AppProperties.readProperties();
 //        second part of a DB passwords is provided by parameter (DB pass = configPass + paramPass)
         try {
             new HotKey().init();

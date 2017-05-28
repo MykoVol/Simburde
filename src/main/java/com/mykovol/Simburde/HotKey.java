@@ -13,24 +13,31 @@ public class HotKey {
             JIntellitype.setLibraryLocation("lib/JIntellitype.dll");
         else JIntellitype.setLibraryLocation("lib/JIntellitype64.dll");
 
-//        show sync with db summary screen on Ctrl+Alt+T
 
-        JIntellitype.getInstance().registerHotKey(1, JIntellitype.MOD_CONTROL + JIntellitype.MOD_ALT, (int) '8');
+//        JIntellitype.getInstance().registerHotKey(1, JIntellitype. MOD_CONTROL + JIntellitype.MOD_ALT, (int) '8');
+        JIntellitype.getInstance().registerHotKey(1, 0, 117);
         JIntellitype.getInstance().registerHotKey(2, JIntellitype.MOD_CONTROL + JIntellitype.MOD_ALT, (int) '9');
         JIntellitype.getInstance().registerHotKey(3, JIntellitype.MOD_CONTROL + JIntellitype.MOD_ALT, (int) '0');
-        JIntellitype.getInstance().registerHotKey(4, JIntellitype.MOD_CONTROL + JIntellitype.MOD_ALT, (int) '7');
+        JIntellitype.getInstance().registerHotKey(4, JIntellitype.MOD_CONTROL + JIntellitype.MOD_ALT, (int) '8');
         JIntellitype.getInstance().addHotKeyListener(arg0 -> {
             if (arg0 == 1)
-                SimburdeConfig.getInstance().showForm();
+//                mouse in new thread to interrupt it than by the same key
+                if (Mouse.isInMove()) Mouse.setInterrupt(true);
+                else {
+                    Thread mouseMoveThread = new Thread(() -> new Mouse().mouseGlide());
+                    mouseMoveThread.start();
+                }
             else if (arg0 == 2) {
                 SimburdeConfig.getInstance().setMouseLeftUpperAngle();
             } else if (arg0 == 3) {
                 SimburdeConfig.getInstance().setMouseRightBottomAngle();
             } else if (arg0 == 4) {
-                new Mouse().mouseGlide(AppProperties.getLeftUpperAngleX(), AppProperties.getLeftUpperAngleY(), AppProperties.getRightBottomAngleX(), AppProperties.getRightBottomAngleY(), 10000, 1000);
+                SimburdeConfig.getInstance().showForm();
+
             }
 
         });
+
 
         SimburdeConfig.getInstance().showForm();
 

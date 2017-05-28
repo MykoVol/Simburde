@@ -3,7 +3,7 @@
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="501" height="317"/>
+      <xy x="48" y="54" width="528" height="352"/>
     </constraints>
     <properties>
       <enabled value="false"/>
@@ -70,11 +70,6 @@
         <properties/>
         <border type="none"/>
         <children>
-          <vspacer id="2d64e">
-            <constraints>
-              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </vspacer>
           <component id="b42dd" class="javax.swing.JTextField" binding="mouseLeftUpperAngle">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
@@ -140,7 +135,7 @@
               </grid>
             </constraints>
             <properties>
-              <text value="100"/>
+              <text value="50"/>
               <toolTipText value="sleep(ms) in mouse click"/>
             </properties>
           </component>
@@ -162,12 +157,12 @@
               <toolTipText value="one left mouse click and scroll after sleep"/>
             </properties>
           </component>
-          <component id="ba7b7" class="javax.swing.JRadioButton" binding="doubleClickRadioButton" default-binding="true">
+          <component id="ba7b7" class="javax.swing.JRadioButton" binding="noClickRadioButton">
             <constraints>
               <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Double click"/>
+              <text value="No click"/>
               <toolTipText value="double left mouse click + escape after sleep"/>
             </properties>
           </component>
@@ -210,6 +205,11 @@
               <text value="Interrupt by move"/>
             </properties>
           </component>
+          <vspacer id="2d64e">
+            <constraints>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
         </children>
       </grid>
     </children>

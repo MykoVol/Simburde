@@ -21,7 +21,7 @@ public class SimburdeConfig extends JDialog {
     private JTextField sleepInMouseClick;
     private JTextField sleepBeforeMouseMove;
     private JRadioButton oneClickRadioButton;
-    private JRadioButton doubleClickRadioButton;
+    private JRadioButton noClickRadioButton;
     private JTextField mouseScroll;
     private JCheckBox interruptByMoveCheckBox;
 
@@ -38,7 +38,7 @@ public class SimburdeConfig extends JDialog {
         sleepBeforeMouseMove.setText(Integer.toString(AppProperties.getSleepBeforeMouseMove()));
         mouseScroll.setText(Integer.toString(AppProperties.getMouseWheelMove()));
         oneClickRadioButton.setSelected(AppProperties.getClickOption() == 1);
-        doubleClickRadioButton.setSelected(AppProperties.getClickOption() == 2);
+        noClickRadioButton.setSelected(AppProperties.getClickOption() == 0);
         interruptByMoveCheckBox.setSelected(AppProperties.isInterruptByMove());
     }
 
@@ -70,7 +70,7 @@ public class SimburdeConfig extends JDialog {
 
 
     public SimburdeConfig() {
-        setTitle("Simburde (aka ИБД) - " + SimburdeConfig.class.getPackage().getImplementationVersion());
+        setTitle("Simburde (aka ИБД) - " + SimburdeConfig.class.getPackage().getImplementationVersion() + "by MykoVol");
         setContentPane(contentPane);
         pack();
         setDefaultLookAndFeelDecorated(true);
@@ -131,7 +131,7 @@ public class SimburdeConfig extends JDialog {
         AppProperties.setSleepBeforeMouseMove(toInt(sleepBeforeMouseMove.getText()));
         AppProperties.setMouseWheelMove(toInt(mouseScroll.getText()));
         if (oneClickRadioButton.isSelected()) AppProperties.setClickOption(1);
-        if (doubleClickRadioButton.isSelected()) AppProperties.setClickOption(2);
+        if (noClickRadioButton.isSelected()) AppProperties.setClickOption(0);
         AppProperties.setInterruptByMove(interruptByMoveCheckBox.isSelected());
 
         AppProperties.saveProperties();
@@ -193,8 +193,6 @@ public class SimburdeConfig extends JDialog {
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(7, 3, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        final Spacer spacer2 = new Spacer();
-        panel3.add(spacer2, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         mouseLeftUpperAngle = new JTextField();
         mouseLeftUpperAngle.setEditable(false);
         mouseLeftUpperAngle.setToolTipText("to set press Ctrl+Alt+'('");
@@ -218,7 +216,7 @@ public class SimburdeConfig extends JDialog {
         mouseSpeed.setToolTipText("mouse delta speed between two points");
         panel3.add(mouseSpeed, new GridConstraints(2, 1, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         sleepInMouseClick = new JTextField();
-        sleepInMouseClick.setText("100");
+        sleepInMouseClick.setText("50");
         sleepInMouseClick.setToolTipText("sleep(ms) in mouse click");
         panel3.add(sleepInMouseClick, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
         final JLabel label5 = new JLabel();
@@ -229,10 +227,10 @@ public class SimburdeConfig extends JDialog {
         oneClickRadioButton.setText("One click");
         oneClickRadioButton.setToolTipText("one left mouse click and scroll after sleep");
         panel3.add(oneClickRadioButton, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        doubleClickRadioButton = new JRadioButton();
-        doubleClickRadioButton.setText("Double click");
-        doubleClickRadioButton.setToolTipText("double left mouse click + escape after sleep");
-        panel3.add(doubleClickRadioButton, new GridConstraints(5, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        noClickRadioButton = new JRadioButton();
+        noClickRadioButton.setText("No click");
+        noClickRadioButton.setToolTipText("double left mouse click + escape after sleep");
+        panel3.add(noClickRadioButton, new GridConstraints(5, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         sleepBeforeMouseMove = new JTextField();
         sleepBeforeMouseMove.setText("100");
         sleepBeforeMouseMove.setToolTipText("sleep(ms) after click");
@@ -248,10 +246,12 @@ public class SimburdeConfig extends JDialog {
         interruptByMoveCheckBox.setSelected(true);
         interruptByMoveCheckBox.setText("Interrupt by move");
         panel3.add(interruptByMoveCheckBox, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer2 = new Spacer();
+        panel3.add(spacer2, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(oneClickRadioButton);
-        buttonGroup.add(doubleClickRadioButton);
+        buttonGroup.add(noClickRadioButton);
     }
 
     /**

@@ -61,27 +61,24 @@ public class Mouse {
 //        init settings
         Robot r = new Robot();
         int t = AppProperties.getMouseSpeed();
-        int n = AppProperties.getMouseSpeed();
+        int n = 1000;
 //        delta move
         double dx = (endX - beginX) / ((double) n);
         double dy = (endY - beginY) / ((double) n);
         double dt = t / ((double) n);
-        double nextX;
-        double nextY;
+        double nextX = 0;
+        double nextY = 0;
         for (int step = 1; step <= n; step++) {
             nextX = (beginX + dx * step);
             nextY = (beginY + dy * step);
             r.mouseMove((int) nextX, (int) nextY);
-            Thread.sleep((int) dt);
+            Thread.sleep((int)dt);
             if (isNeedBreak(nextX, nextY)) break;
-//        if end point is reached than click and start moving to next point
-            if (nextX == endX && nextY == endY) {
-                mouseClick(r);
-                Thread.sleep(AppProperties.getSleepBeforeMouseMove());
-                if (isNeedBreak(nextX, nextY)) break;
-                moveToRandomPoint();
-            }
         }
+        mouseClick(r);
+        Thread.sleep(AppProperties.getSleepBeforeMouseMove());
+        if (isNeedBreak(nextX, nextY)) return;
+        moveToRandomPoint();
     }
 
     private void mouseClick(Robot r) throws InterruptedException {
@@ -94,16 +91,6 @@ public class Mouse {
             Thread.sleep(AppProperties.getSleepInMouseClick());
             r.mouseRelease(InputEvent.BUTTON1_MASK);
             r.mouseWheel(getRandomBetween(-AppProperties.getMouseWheelMove(), AppProperties.getMouseWheelMove()));
-        } else if (AppProperties.getClickOption() == 2) {
-            r.keyPress(KeyEvent.VK_ESCAPE);
-            r.keyRelease(KeyEvent.VK_ESCAPE);
-
-            r.mousePress(InputEvent.BUTTON1_MASK);
-            r.mouseRelease(InputEvent.BUTTON1_MASK);
-            r.mousePress(InputEvent.BUTTON1_MASK);
-            r.mouseRelease(InputEvent.BUTTON1_MASK);
-
-            r.mouseWheel(getRandomBetween(-AppProperties.getMouseWheelMove(), AppProperties.getMouseWheelMove()));
         }
     }
 
@@ -113,14 +100,20 @@ public class Mouse {
             MouesPosition mouseNow = new MouesPosition();
             positionChanged = (int) mouseNow.getX() != (int) X || (int) mouseNow.getY() != (int) Y;
 
-            if (positionChanged){
-                LOGGER.debug("Mouse interrupted");
-                LOGGER.debug("Was int X,Y"+Integer.toString((int)X)+"; "+Integer.toString((int)Y));
-                LOGGER.debug("Was dbl X,Y"+Double.toString(X)+"; "+Double.toString(Y));
-                LOGGER.debug("Cur dbl X,Y"+Double.toString(mouseNow.getX())+"; "+Double.toString(mouseNow.getY()));
-            }
+//            if (positionChanged){
+////                temp take cur position one move time
+//                LOGGER.debug("Mouse interrupted. Second try");
+//                LOGGER.debug("Was int X,Y"+Integer.toString((int)X)+"; "+Integer.toString((int)Y));
+//                LOGGER.debug("Was dbl X,Y"+Double.toString(X)+"; "+Double.toString(Y));
+//                LOGGER.debug("Cur dbl X,Y"+Double.toString(mouseNow.getX())+"; "+Double.toString(mouseNow.getY()));
+//                mouseNow = new MouesPosition();
+//                positionChanged = (int) mouseNow.getX() != (int) X || (int) mouseNow.getY() != (int) Y;
+//                LOGGER.debug("Second results");
+//                LOGGER.debug("Was int X,Y"+Integer.toString((int)X)+"; "+Integer.toString((int)Y));
+//                LOGGER.debug("Was dbl X,Y"+Double.toString(X)+"; "+Double.toString(Y));
+//                LOGGER.debug("Cur dbl X,Y"+Double.toString(mouseNow.getX())+"; "+Double.toString(mouseNow.getY()));
+//            }
         }
-
 
         return (positionChanged || getInterrupt());
     }

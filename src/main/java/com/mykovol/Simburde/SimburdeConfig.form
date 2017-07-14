@@ -3,7 +3,7 @@
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="528" height="352"/>
+      <xy x="48" y="54" width="528" height="379"/>
     </constraints>
     <properties>
       <enabled value="false"/>
@@ -46,12 +46,14 @@
               <toolTipText value="exit application. To hide press Escape, OK or Close window"/>
             </properties>
           </component>
-          <component id="fafdc" class="javax.swing.JLabel">
+          <component id="fafdc" class="javax.swing.JLabel" binding="msgField">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <enabled value="false"/>
+              <foreground color="-4473925"/>
+              <inheritsPopupMenu value="true"/>
               <text value="F6 - start/stop   Ctrl+Alt+8 - show form "/>
             </properties>
           </component>
@@ -62,7 +64,7 @@
           </hspacer>
         </children>
       </grid>
-      <grid id="e3588" layout-manager="GridLayoutManager" row-count="7" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e3588" layout-manager="GridLayoutManager" row-count="8" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -136,7 +138,7 @@
             </constraints>
             <properties>
               <text value="50"/>
-              <toolTipText value="sleep(ms) in mouse click"/>
+              <toolTipText value="random sleep(ms) in mouse click"/>
             </properties>
           </component>
           <component id="2a214" class="javax.swing.JLabel">
@@ -174,7 +176,7 @@
             </constraints>
             <properties>
               <text value="100"/>
-              <toolTipText value="sleep(ms) after click"/>
+              <toolTipText value="random sleep(ms) after click"/>
             </properties>
           </component>
           <component id="d61a5" class="javax.swing.JTextField" binding="mouseScroll">
@@ -196,6 +198,19 @@
               <text value="Scroll"/>
             </properties>
           </component>
+          <vspacer id="2d64e">
+            <constraints>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <component id="43615" class="javax.swing.JButton" binding="checkForUpdatesButton" default-binding="true">
+            <constraints>
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Check for Updates"/>
+            </properties>
+          </component>
           <component id="d39f1" class="javax.swing.JCheckBox" binding="interruptByMoveCheckBox" default-binding="true">
             <constraints>
               <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -205,11 +220,15 @@
               <text value="Interrupt by move"/>
             </properties>
           </component>
-          <vspacer id="2d64e">
+          <component id="ba183" class="javax.swing.JButton" binding="updateButton" default-binding="true">
             <constraints>
-              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+              <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-          </vspacer>
+            <properties>
+              <text value="Update"/>
+              <visible value="true"/>
+            </properties>
+          </component>
         </children>
       </grid>
     </children>

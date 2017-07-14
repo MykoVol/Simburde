@@ -1,1 +1,1 @@
-start javaw -jar -Xms1024m -Xmx1024m Simburde-1.0.jar
+start javaw -jar -Xms1024m -Xmx1024m Simburde.jar

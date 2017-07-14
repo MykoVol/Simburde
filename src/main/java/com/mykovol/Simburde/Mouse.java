@@ -32,66 +32,103 @@ public class Mouse {
         }
     }
 
-    private int getRandomBetween(int min, int max) {
+    private int getRandom(int min, int max) {
         Random r = new Random();
-        if (min > 0) return r.nextInt(max - min) + min;
-        else return r.nextInt(max + max) + min;
+        int res = 0;
+        if (max >= 0 && min <= 0) res = r.nextInt((max + Math.abs(min)) + 1) + min;
+        else if (max >= 0 && min >= 0) res = r.nextInt((max - min) + 1) + min;
+        else if (max <= 0 && min <= 0) res = -r.nextInt((Math.abs(min) - Math.abs(max)) + 1) + Math.abs(max);
+//        LOGGER.info("Rand = " + res + "(" + min + "/" + max + ")");
+        return res;
     }
+
+
+    private int getRandom(int max) {
+        return getRandom(0, max);
+    }
+
 
     public void mouseGlide() {
         try {
-            setInterrupt(false);
-            moveToRandomPoint();
+            setInterrupt(false);//init set
+            humanMouseMove();
         } catch (AWTException e) {
             LOGGER.error(e);
-        } catch (InterruptedException e) {
-            LOGGER.error(e);
         }
     }
 
+    public void humanMouseMove() throws AWTException {
+        Robot robot = new Robot();
+//       current position
+        Point pointStart = MouseInfo.getPointerInfo().getLocation();
+//        new random point in range
+        int endX = getRandom(AppProperties.getLeftUpperAngleX(), AppProperties.getRightBottomAngleX());
+        int endY = getRandom(AppProperties.getLeftUpperAngleY(), AppProperties.getRightBottomAngleY());
+        Point pointEnd = new Point(endX, endY);
 
-    private void moveToRandomPoint() throws InterruptedException, AWTException {
-//        current position
-        MouesPosition mouseNow = new MouesPosition();
-        int beginX = (int) mouseNow.getX();
-        int beginY = (int) mouseNow.getY();
-//        new random pint in range
-        int endX = getRandomBetween(AppProperties.getLeftUpperAngleX(), AppProperties.getRightBottomAngleX());
-        int endY = getRandomBetween(AppProperties.getLeftUpperAngleY(), AppProperties.getRightBottomAngleY());
-//        init settings
-        Robot r = new Robot();
-        int t = AppProperties.getMouseSpeed();
-        int n = 1000;
-//        delta move
-        double dx = (endX - beginX) / ((double) n);
-        double dy = (endY - beginY) / ((double) n);
-        double dt = t / ((double) n);
-        double nextX = 0;
-        double nextY = 0;
-        for (int step = 1; step <= n; step++) {
-            nextX = (beginX + dx * step);
-            nextY = (beginY + dy * step);
-            r.mouseMove((int) nextX, (int) nextY);
-            Thread.sleep((int)dt);
-            if (isNeedBreak(nextX, nextY)) break;
+        int speed = AppProperties.getMouseSpeed();
+
+        Point[] cowardList;
+        double t;    //the time interval
+        double k = .025;
+        cowardList = new Point[4];
+
+        //set the beginning and end points
+        cowardList[0] = pointStart;
+        cowardList[3] = new Point(getRandom(AppProperties.getLeftUpperAngleX(), AppProperties.getRightBottomAngleX()), (getRandom(AppProperties.getLeftUpperAngleY(), AppProperties.getRightBottomAngleY())));
+
+        int xout = Math.abs(pointEnd.x - pointStart.x) / 10;
+        int yout = Math.abs(pointEnd.y - pointStart.y) / 10;
+
+        int x = 0, y = 0;
+//        intermediate points
+        x = pointStart.x < pointEnd.x
+                ? pointStart.x + ((xout > 0) ? getRandom(1, xout) : 1)
+                : pointStart.x - ((xout > 0) ? getRandom(1, xout) : 1);
+        y = pointStart.y < pointEnd.y
+                ? pointStart.y + ((yout > 0) ? getRandom(1, yout) : 1)
+                : pointStart.y - ((yout > 0) ? getRandom(1, yout) : 1);
+        cowardList[1] = new Point(x, y);
+
+        x = pointEnd.x < pointStart.x
+                ? pointEnd.x + ((xout > 0) ? getRandom(1, xout) : 1)
+                : pointEnd.x - ((xout > 0) ? getRandom(1, xout) : 1);
+        y = pointEnd.y < pointStart.y
+                ? pointEnd.y + ((yout > 0) ? getRandom(1, yout) : 1)
+                : pointEnd.y - ((yout > 0) ? getRandom(1, yout) : 1);
+        cowardList[2] = new Point(x, y);
+
+        double px = 0, py = 0;
+        for (t = k; t <= 1 + k; t += k) {
+            //use Berstein polynomials
+            px = (cowardList[0].x + t * (-cowardList[0].x * 3 + t * (3 * cowardList[0].x -
+                    cowardList[0].x * t))) + t * (3 * cowardList[1].x + t * (-6 * cowardList[1].x +
+                    cowardList[1].x * 3 * t)) + t * t * (cowardList[2].x * 3 - cowardList[2].x * 3 * t) +
+                    cowardList[3].x * t * t * t;
+            py = (cowardList[0].y + t * (-cowardList[0].y * 3 + t * (3 * cowardList[0].y -
+                    cowardList[0].y * t))) + t * (3 * cowardList[1].y + t * (-6 * cowardList[1].y +
+                    cowardList[1].y * 3 * t)) + t * t * (cowardList[2].y * 3 - cowardList[2].y * 3 * t) +
+                    cowardList[3].y * t * t * t;
+            robot.mouseMove((int) px, (int) py);
+            robot.delay(getRandom(speed, speed * 2));
+            if (isNeedBreak((int) px, (int) py)) return;
         }
-        mouseClick(r);
-        Thread.sleep(AppProperties.getSleepBeforeMouseMove());
-        if (isNeedBreak(nextX, nextY)) return;
-        moveToRandomPoint();
+        mouseClick(robot);
+        robot.delay(getRandom(AppProperties.getSleepBeforeMouseMove()));
+        humanMouseMove();
     }
 
-    private void mouseClick(Robot r) throws InterruptedException {
+    private void mouseClick(Robot r) {
         if (AppProperties.isPressCtrl()) {
             r.keyPress(KeyEvent.VK_CONTROL);
             r.keyRelease(KeyEvent.VK_CONTROL);
         }
         if (AppProperties.getClickOption() == 1) {
             r.mousePress(InputEvent.BUTTON1_MASK);
-            Thread.sleep(AppProperties.getSleepInMouseClick());
+            r.delay(getRandom(AppProperties.getSleepInMouseClick()));
             r.mouseRelease(InputEvent.BUTTON1_MASK);
-            r.mouseWheel(getRandomBetween(-AppProperties.getMouseWheelMove(), AppProperties.getMouseWheelMove()));
         }
+        r.mouseWheel(getRandom(-AppProperties.getMouseWheelMove(), AppProperties.getMouseWheelMove()));
     }
 
     private boolean isNeedBreak(double X, double Y) {
@@ -111,7 +148,7 @@ public class Mouse {
 //                LOGGER.debug("Second results");
 //                LOGGER.debug("Was int X,Y"+Integer.toString((int)X)+"; "+Integer.toString((int)Y));
 //                LOGGER.debug("Was dbl X,Y"+Double.toString(X)+"; "+Double.toString(Y));
-//                LOGGER.debug("Cur dbl X,Y"+Double.toString(mouseNow.getX())+"; "+Double.toString(mouseNow.getY()));
+//                LOGGER.debug("Cuwr dbl X,Y"+Double.toString(mouseNow.getX())+"; "+Double.toString(mouseNow.getY()));
 //            }
         }
 

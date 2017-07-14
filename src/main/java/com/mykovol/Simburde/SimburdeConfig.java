@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 public class SimburdeConfig extends JDialog {
     private static final Logger LOGGER = Logger.getLogger(SimburdeConfig.class);
@@ -24,7 +25,14 @@ public class SimburdeConfig extends JDialog {
     private JRadioButton noClickRadioButton;
     private JTextField mouseScroll;
     private JCheckBox interruptByMoveCheckBox;
+    private JLabel msgField;
+    private JButton checkForUpdatesButton;
+    public JButton updateButton;
+    private String defaultMsg = "F6 - start/stop   Ctrl+Alt+8 - show form";
 
+    public void setDefaultMsg(String msgText) {
+        defaultMsg = msgText;
+    }
 
     static SimburdeConfig getInstance() {
         return SimburdeConfigInstance;
@@ -40,6 +48,8 @@ public class SimburdeConfig extends JDialog {
         oneClickRadioButton.setSelected(AppProperties.getClickOption() == 1);
         noClickRadioButton.setSelected(AppProperties.getClickOption() == 0);
         interruptByMoveCheckBox.setSelected(AppProperties.isInterruptByMove());
+        msgField.setText(defaultMsg);
+        updateButton.setVisible(false);
     }
 
     public void showForm() {
@@ -70,7 +80,7 @@ public class SimburdeConfig extends JDialog {
 
 
     public SimburdeConfig() {
-        setTitle("Simburde (aka ИБД) - " + SimburdeConfig.class.getPackage().getImplementationVersion() + "by MykoVol");
+        setTitle("Simburde (aka ИБД) - " + SimburdeConfig.class.getPackage().getImplementationVersion() + " by MykoVol");
         setContentPane(contentPane);
         pack();
         setDefaultLookAndFeelDecorated(true);
@@ -85,15 +95,6 @@ public class SimburdeConfig extends JDialog {
             }
         });
 
-        //on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-
-        //on button CLOSE
         buttonExit.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -102,7 +103,6 @@ public class SimburdeConfig extends JDialog {
 
             }
         });
-        //on button OK
         buttonOK.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -111,6 +111,65 @@ public class SimburdeConfig extends JDialog {
 
             }
         });
+        contentPane.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                super.keyPressed(e);
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) onCancel();
+            }
+        });
+        buttonOK.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) onOK();
+            }
+        });
+        buttonOK.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                super.keyTyped(e);
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) onOK();
+            }
+        });
+        checkForUpdatesButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                onCheckForUpdates();
+            }
+        });
+        updateButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                onUpdate();
+            }
+        });
+    }
+
+    private void onUpdate() {
+        try {
+//            ProcessBuilder builder = new ProcessBuilder("cmd", "/b", "applyUpdate.bat");
+//            builder.start();
+            Runtime.getRuntime().exec("cmd start /C applyUpdate.bat");
+//            final int exitVal = process.waitFor();
+//            if (exitVal == 0)
+            System.exit(0);
+//        } catch (InterruptedException e) {
+//            LOGGER.error(e);
+        } catch (IOException e) {
+            LOGGER.error("cannot find apply bat", e);
+        }
+    }
+
+    private void onCheckForUpdates() {
+        Thread updateThread = new Thread(() -> new AppUpdate());
+        updateThread.start();
+    }
+
+    public void setMsg(String msg) {
+        msgField.setText(msg);
     }
 
     private int toInt(String s) {
@@ -184,14 +243,16 @@ public class SimburdeConfig extends JDialog {
         buttonExit.setText("Exit");
         buttonExit.setToolTipText("exit application. To hide press Escape, OK or Close window");
         panel1.add(buttonExit, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label1 = new JLabel();
-        label1.setEnabled(false);
-        label1.setText("F6 - start/stop   Ctrl+Alt+8 - show form ");
-        panel1.add(label1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        msgField = new JLabel();
+        msgField.setEnabled(false);
+        msgField.setForeground(new Color(-4473925));
+        msgField.setInheritsPopupMenu(true);
+        msgField.setText("F6 - start/stop   Ctrl+Alt+8 - show form ");
+        panel1.add(msgField, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         panel1.add(spacer1, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridLayoutManager(7, 3, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.setLayout(new GridLayoutManager(8, 3, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         mouseLeftUpperAngle = new JTextField();
         mouseLeftUpperAngle.setEditable(false);
@@ -201,15 +262,15 @@ public class SimburdeConfig extends JDialog {
         mouseRightBottomAngle.setEditable(false);
         mouseRightBottomAngle.setToolTipText("to set press Ctrl+Alt+')'");
         panel3.add(mouseRightBottomAngle, new GridConstraints(1, 1, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        final JLabel label1 = new JLabel();
+        label1.setText("Left-Top point");
+        panel3.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label2 = new JLabel();
-        label2.setText("Left-Top point");
-        panel3.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        label2.setText("Right-Bottom point");
+        panel3.add(label2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label3 = new JLabel();
-        label3.setText("Right-Bottom point");
-        panel3.add(label3, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JLabel label4 = new JLabel();
-        label4.setText("Move delay");
-        panel3.add(label4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        label3.setText("Move delay");
+        panel3.add(label3, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         mouseSpeed = new JTextField();
         mouseSpeed.setEnabled(true);
         mouseSpeed.setText("1000");
@@ -219,9 +280,9 @@ public class SimburdeConfig extends JDialog {
         sleepInMouseClick.setText("50");
         sleepInMouseClick.setToolTipText("sleep(ms) in mouse click");
         panel3.add(sleepInMouseClick, new GridConstraints(4, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        final JLabel label5 = new JLabel();
-        label5.setText("Sleep");
-        panel3.add(label5, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label4 = new JLabel();
+        label4.setText("Sleep");
+        panel3.add(label4, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         oneClickRadioButton = new JRadioButton();
         oneClickRadioButton.setSelected(true);
         oneClickRadioButton.setText("One click");
@@ -239,15 +300,22 @@ public class SimburdeConfig extends JDialog {
         mouseScroll.setText("5");
         mouseScroll.setToolTipText("scroll up and down");
         panel3.add(mouseScroll, new GridConstraints(3, 1, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        final JLabel label6 = new JLabel();
-        label6.setText("Scroll");
-        panel3.add(label6, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label5 = new JLabel();
+        label5.setText("Scroll");
+        panel3.add(label5, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer2 = new Spacer();
+        panel3.add(spacer2, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        checkForUpdatesButton = new JButton();
+        checkForUpdatesButton.setText("Check for Updates");
+        panel3.add(checkForUpdatesButton, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         interruptByMoveCheckBox = new JCheckBox();
         interruptByMoveCheckBox.setSelected(true);
         interruptByMoveCheckBox.setText("Interrupt by move");
         panel3.add(interruptByMoveCheckBox, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final Spacer spacer2 = new Spacer();
-        panel3.add(spacer2, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        updateButton = new JButton();
+        updateButton.setText("Update");
+        updateButton.setVisible(true);
+        panel3.add(updateButton, new GridConstraints(7, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         ButtonGroup buttonGroup;
         buttonGroup = new ButtonGroup();
         buttonGroup.add(oneClickRadioButton);

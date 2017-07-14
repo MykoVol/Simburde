@@ -12,6 +12,12 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
+        if (args.length>0) {
+            if (Integer.parseInt(args[0])<4) SimburdeConfig.getInstance().setDefaultMsg("Successfully updated");
+            else SimburdeConfig.getInstance().setDefaultMsg("Update failed!");
+        }
+
+
         AppProperties.readProperties();
 //        second part of a DB passwords is provided by parameter (DB pass = configPass + paramPass)
         try {

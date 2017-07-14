@@ -38,7 +38,6 @@ public class HotKey {
 
         });
 
-
         SimburdeConfig.getInstance().showForm();
 
     }

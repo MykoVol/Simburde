@@ -61,6 +61,16 @@ public class AppProperties {
     private static boolean interruptByMove;
     private static boolean pressCtrl;
 
+    public static String getKeyCharacters() {
+        return keyCharacters;
+    }
+
+    public static void setKeyCharacters(String keyCharacters) {
+        AppProperties.keyCharacters = keyCharacters;
+    }
+
+    private static String keyCharacters = "";
+
     public static boolean isPressCtrl() {
         return pressCtrl;
     }

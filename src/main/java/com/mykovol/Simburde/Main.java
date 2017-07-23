@@ -19,7 +19,6 @@ public class Main {
 
 
         AppProperties.readProperties();
-//        second part of a DB passwords is provided by parameter (DB pass = configPass + paramPass)
         try {
             new HotKey().init();
         } catch (Exception e) {

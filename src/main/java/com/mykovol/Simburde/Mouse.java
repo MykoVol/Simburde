@@ -12,25 +12,21 @@ import java.util.Random;
  */
 public class Mouse {
     private static final Logger LOGGER = Logger.getLogger(Mouse.class);
-    private static Boolean interruptMouseMove = true;
+    private static MouseStatus mouseStatus = MouseStatus.INACTIVE;
 
-    public static Boolean isInMove() {
-        synchronized (Mouse.interruptMouseMove) {
-            return !Mouse.interruptMouseMove;
-        }
+    public static void setStatus(MouseStatus currentStatus) {
+//        synchronized (Mouse.mouseStatus) {
+        mouseStatus = currentStatus;
+//            return !Mouse.mouseStatus;
+//        }
     }
 
-    public static Boolean getInterrupt() {
-        synchronized (Mouse.interruptMouseMove) {
-            return Mouse.interruptMouseMove;
-        }
+    public static MouseStatus getStatus() {
+//        synchronized (Mouse.mouseStatus) {
+        return mouseStatus;
+//        }
     }
 
-    public static void setInterrupt(boolean interruptMouseMove) {
-        synchronized (Mouse.interruptMouseMove) {
-            Mouse.interruptMouseMove = interruptMouseMove;
-        }
-    }
 
     private int getRandom(int min, int max) {
         Random r = new Random();
@@ -50,14 +46,18 @@ public class Mouse {
 
     public void mouseGlide() {
         try {
-            setInterrupt(false);//init set
+            Mouse.setStatus(MouseStatus.ACTIVE);
             humanMouseMove();
         } catch (AWTException e) {
             LOGGER.error(e);
+        } catch (InterruptedException a) {
+        } finally {
+            Mouse.setStatus(MouseStatus.INACTIVE);
         }
     }
 
-    public void humanMouseMove() throws AWTException {
+    public void humanMouseMove() throws AWTException, InterruptedException {
+        if (Mouse.getStatus() != mouseStatus.ACTIVE) throw new InterruptedException();
         Robot robot = new Robot();
 //       current position
         Point pointStart = MouseInfo.getPointerInfo().getLocation();
@@ -70,7 +70,8 @@ public class Mouse {
 
         Point[] cowardList;
         double t;    //the time interval
-        double k = .025;
+        double k =.0005*speed;// .025;
+        if  (k>.025) k = .025;
         cowardList = new Point[4];
 
         //set the beginning and end points
@@ -110,11 +111,14 @@ public class Mouse {
                     cowardList[1].y * 3 * t)) + t * t * (cowardList[2].y * 3 - cowardList[2].y * 3 * t) +
                     cowardList[3].y * t * t * t;
             robot.mouseMove((int) px, (int) py);
-            robot.delay(getRandom(speed, speed * 2));
-            if (isNeedBreak((int) px, (int) py)) return;
+            robot.delay(getRandom(0, Math.round(1000/speed)));
+            if (isNeedBreak((int) px, (int) py)) throw new InterruptedException();
         }
         mouseClick(robot);
+        if (Mouse.getStatus() != mouseStatus.ACTIVE) throw new InterruptedException();
         robot.delay(getRandom(AppProperties.getSleepBeforeMouseMove()));
+        printCharacters(robot);
+        if (Mouse.getStatus() != mouseStatus.ACTIVE) throw new InterruptedException();
         humanMouseMove();
     }
 
@@ -125,10 +129,23 @@ public class Mouse {
         }
         if (AppProperties.getClickOption() == 1) {
             r.mousePress(InputEvent.BUTTON1_MASK);
-            r.delay(getRandom(AppProperties.getSleepInMouseClick()));
             r.mouseRelease(InputEvent.BUTTON1_MASK);
+            r.keyPress(KeyEvent.VK_ESCAPE);
+            r.keyRelease(KeyEvent.VK_ESCAPE);
         }
         r.mouseWheel(getRandom(-AppProperties.getMouseWheelMove(), AppProperties.getMouseWheelMove()));
+    }
+
+    private void printCharacters(Robot r) {
+        if (!AppProperties.getKeyCharacters().isEmpty()) {
+            r.keyPress(KeyEvent.VK_V);
+            r.keyRelease(KeyEvent.VK_V);
+            r.delay(1000);
+            r.keyPress(KeyEvent.VK_CONTROL);
+            r.keyPress(KeyEvent.VK_Z);
+            r.keyRelease(KeyEvent.VK_Z);
+            r.keyRelease(KeyEvent.VK_CONTROL);
+        }
     }
 
     private boolean isNeedBreak(double X, double Y) {
@@ -136,22 +153,7 @@ public class Mouse {
         if (AppProperties.isInterruptByMove()) {
             MouesPosition mouseNow = new MouesPosition();
             positionChanged = (int) mouseNow.getX() != (int) X || (int) mouseNow.getY() != (int) Y;
-
-//            if (positionChanged){
-////                temp take cur position one move time
-//                LOGGER.debug("Mouse interrupted. Second try");
-//                LOGGER.debug("Was int X,Y"+Integer.toString((int)X)+"; "+Integer.toString((int)Y));
-//                LOGGER.debug("Was dbl X,Y"+Double.toString(X)+"; "+Double.toString(Y));
-//                LOGGER.debug("Cur dbl X,Y"+Double.toString(mouseNow.getX())+"; "+Double.toString(mouseNow.getY()));
-//                mouseNow = new MouesPosition();
-//                positionChanged = (int) mouseNow.getX() != (int) X || (int) mouseNow.getY() != (int) Y;
-//                LOGGER.debug("Second results");
-//                LOGGER.debug("Was int X,Y"+Integer.toString((int)X)+"; "+Integer.toString((int)Y));
-//                LOGGER.debug("Was dbl X,Y"+Double.toString(X)+"; "+Double.toString(Y));
-//                LOGGER.debug("Cuwr dbl X,Y"+Double.toString(mouseNow.getX())+"; "+Double.toString(mouseNow.getY()));
-//            }
         }
-
-        return (positionChanged || getInterrupt());
+        return (positionChanged || Mouse.getStatus() != MouseStatus.ACTIVE);
     }
 }

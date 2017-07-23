@@ -22,12 +22,15 @@ public class HotKey {
         JIntellitype.getInstance().addHotKeyListener(arg0 -> {
             if (arg0 == 1)
 //                mouse in new thread to interrupt it than by the same key
-                if (Mouse.isInMove()) Mouse.setInterrupt(true);
-                else {
+            {
+                if (Mouse.getStatus() == MouseStatus.ACTIVE) Mouse.setStatus(MouseStatus.STOPPING);
+                else if (Mouse.getStatus() == MouseStatus.INACTIVE) {
+                    Mouse.setStatus(MouseStatus.STARTING);
                     Thread mouseMoveThread = new Thread(() -> new Mouse().mouseGlide());
                     mouseMoveThread.start();
                 }
-            else if (arg0 == 2) {
+//                else do nothing mouse is starting or stopping right now
+            } else if (arg0 == 2) {
                 SimburdeConfig.getInstance().setMouseLeftUpperAngle();
             } else if (arg0 == 3) {
                 SimburdeConfig.getInstance().setMouseRightBottomAngle();
@@ -38,7 +41,9 @@ public class HotKey {
 
         });
 
-        SimburdeConfig.getInstance().showForm();
+        SimburdeConfig.getInstance().
+
+                showForm();
 
     }
 

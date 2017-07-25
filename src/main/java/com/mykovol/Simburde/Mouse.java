@@ -47,7 +47,9 @@ public class Mouse {
     public void mouseGlide() {
         try {
             Mouse.setStatus(MouseStatus.ACTIVE);
-            humanMouseMove();
+            Robot robot = new Robot();
+            //move mouse from point to point till it is stopped
+            while (Mouse.getStatus()==MouseStatus.ACTIVE) humanMouseMove(robot);
         } catch (AWTException e) {
             LOGGER.error(e);
         } catch (InterruptedException a) {
@@ -56,9 +58,8 @@ public class Mouse {
         }
     }
 
-    public void humanMouseMove() throws AWTException, InterruptedException {
+    public void humanMouseMove(Robot robot) throws AWTException, InterruptedException {
         if (Mouse.getStatus() != mouseStatus.ACTIVE) throw new InterruptedException();
-        Robot robot = new Robot();
 //       current position
         Point pointStart = MouseInfo.getPointerInfo().getLocation();
 //        new random point in range
@@ -119,7 +120,6 @@ public class Mouse {
         robot.delay(getRandom(AppProperties.getSleepBeforeMouseMove()));
         printCharacters(robot);
         if (Mouse.getStatus() != mouseStatus.ACTIVE) throw new InterruptedException();
-        humanMouseMove();
     }
 
     private void mouseClick(Robot r) {
@@ -152,7 +152,8 @@ public class Mouse {
         Boolean positionChanged = false;
         if (AppProperties.isInterruptByMove()) {
             MouesPosition mouseNow = new MouesPosition();
-            positionChanged = (int) mouseNow.getX() != (int) X || (int) mouseNow.getY() != (int) Y;
+//            mouse moved more than for 5 px
+            positionChanged = (Math.abs(mouseNow.getX() - X) > 5) || (Math.abs(mouseNow.getY() - Y)>5);
         }
         return (positionChanged || Mouse.getStatus() != MouseStatus.ACTIVE);
     }
